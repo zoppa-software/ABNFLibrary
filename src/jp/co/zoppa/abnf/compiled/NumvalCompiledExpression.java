@@ -3,8 +3,8 @@ package jp.co.zoppa.abnf.compiled;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.co.zoppa.abnf.AnalyzeRange;
-import jp.co.zoppa.abnf.CompiledRules;
+import jp.co.zoppa.abnf.ABNFAnalyzeItem;
+import jp.co.zoppa.abnf.ABNFCompiledRules;
 import jp.co.zoppa.abnf.accesser.IByteAccesser;
 import jp.co.zoppa.abnf.expression.ExpressionEnum;
 import jp.co.zoppa.abnf.expression.ExpressionRange;
@@ -30,6 +30,7 @@ public final class NumvalCompiledExpression implements ICompiledExpression {
     public NumvalCompiledExpression(ExpressionRange expression) {
         this.type = expression.getSpan().getByte(1);
 
+        // 表現式の種類を取得
         List<ExpressionRange> subRanges = expression.getSubRanges().get(0).getSubRanges();
         if (subRanges.size() >= 2) {
             this.exprem = subRanges.get(1).getExpression().getNo();
@@ -38,6 +39,7 @@ public final class NumvalCompiledExpression implements ICompiledExpression {
             this.exprem = ExpressionEnum.NUMVAL;
         }
 
+        // 数値リストを取得
         this.values = new ArrayList<>();
         for (ExpressionRange valueExpr : expression.getSubRanges().get(0).getSubRanges()) {
             String v = valueExpr.getSpan().toString();
@@ -57,23 +59,18 @@ public final class NumvalCompiledExpression implements ICompiledExpression {
     }
 
     @Override
-    public boolean analyze(CompiledRules rules, IByteAccesser accesser, List<AnalyzeRange> answer) {
+    public boolean analyze(ABNFCompiledRules rules, IByteAccesser accesser, List<ABNFAnalyzeItem> answer) {
         IByteAccesser.IPosition mark = accesser.mark();
-        //int start = accesser.getPosition();
 
         switch (this.exprem) {
             case ExpressionEnum.NUMVAL:
                 if (values.get(0).num == accesser.read()) {
-                    //AnalyzeRange range = new AnalyzeRange(this.exprem, "", accesser.span(start, accesser.getPosition()));
-                    //answer.add(range);
                     return true;
                 }
                 break;
             case ExpressionEnum.NUMVAL_RANGE:
                 int rval = accesser.read();
                 if (values.get(0).num <= rval && rval <= values.get(1).num) {
-                    //AnalyzeRange range = new AnalyzeRange(this.exprem, "", accesser.span(start, accesser.getPosition()));
-                    //answer.add(range);
                     return true;
                 }
                 break;
@@ -86,8 +83,6 @@ public final class NumvalCompiledExpression implements ICompiledExpression {
                     }
                 }
                 if (conf) {
-                    //AnalyzeRange range = new AnalyzeRange(this.exprem, "", accesser.span(start, accesser.getPosition()));
-                    //answer.add(range);
                     return true;
                 } 
                 break;

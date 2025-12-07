@@ -1,8 +1,8 @@
 package tests;
 
-import jp.co.zoppa.abnf.AnalyzeRange;
-import jp.co.zoppa.abnf.CompiledRules;
-import jp.co.zoppa.abnf.SyntaxAnalysis;
+import jp.co.zoppa.abnf.ABNFAnalyzeItem;
+import jp.co.zoppa.abnf.ABNFCompiledRules;
+import jp.co.zoppa.abnf.ABNFSyntaxAnalysis;
 import jp.co.zoppa.abnf.accesser.ByteAccesser;
 
 import org.junit.jupiter.api.Test;
@@ -43,11 +43,19 @@ zip-code         = 5DIGIT [\"-\" 4DIGIT]
         ByteAccesser accesser = new ByteAccesser(grammer);
         assertEquals(0, accesser.getPosition());
 
-        CompiledRules rules = SyntaxAnalysis.compile(grammer);
+        ABNFCompiledRules rules = ABNFSyntaxAnalysis.compile(grammer);
 
-        List<AnalyzeRange> answer = rules.analyze("postal-address", new ByteAccesser("123 Main Street\r\nLos Angeles, CA 90012\r\n"));
+        ABNFAnalyzeItem answer = rules.analyze("postal-address", new ByteAccesser("123 Main Street\r\nLos Angeles, CA 90012\r\n"));
 
-        int a = 0;
+        ABNFAnalyzeItem node;
+        node = answer.searchByRuleName("street").get(0).searchByRuleName("apt").get(0);
+        assertEquals("123", node.getSpan().toString());
+
+        node = answer.searchByRuleName("street").get(0).searchByRuleName("house-num").get(0);
+        assertEquals("Main", node.getSpan().toString());
+
+        node = answer.searchByRuleName("street").get(0).searchByRuleName("street-name").get(0);
+        assertEquals("Street", node.getSpan().toString());
     }
 
 }

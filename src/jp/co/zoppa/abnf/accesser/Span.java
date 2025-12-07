@@ -101,6 +101,22 @@ public final class Span {
     }
 
     /**
+     * 文字列表現を取得する。
+     * @param limit 最大長。
+     * @return 文字列表現。
+     */
+    public String toString(int limit) {
+        int len = (end - start <= limit ? end - start : limit);
+        byte[] range = new byte[len];
+        System.arraycopy(this.data, start, range, 0, len);
+        try {
+            return new String(range, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return "<invalid>";
+        }
+    }
+
+    /**
      * アクセス元のデータと範囲が等しいかを判定する。
      * @param accesser アクセス元。
      * @return 等しい場合はtrue、そうでない場合はfalse。

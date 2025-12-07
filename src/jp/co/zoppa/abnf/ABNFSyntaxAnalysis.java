@@ -9,14 +9,14 @@ import jp.co.zoppa.abnf.expression.ExpressionDefines;
 import jp.co.zoppa.abnf.expression.ExpressionEnum;
 import jp.co.zoppa.abnf.expression.ExpressionRange;
 
-public final class SyntaxAnalysis {
+public final class ABNFSyntaxAnalysis {
 
     /**
      * ABNF文法をコンパイルする。
      * @param accesser ABNF文法のバイトアクセス。
      * @return コンパイル済みルール。
      */
-    public static CompiledRules compile(ByteAccesser accesser) {
+    public static ABNFCompiledRules compile(ByteAccesser accesser) {
         ExpressionRange answer = ExpressionDefines.getRuleListExpr().match(accesser);
 
         Map<String, RuleCompiledExpression> compiled = new TreeMap<>();
@@ -29,7 +29,7 @@ public final class SyntaxAnalysis {
                 );
             }
         }
-        return new CompiledRules(compiled);
+        return new ABNFCompiledRules(compiled);
     }
 
     /**
@@ -37,7 +37,7 @@ public final class SyntaxAnalysis {
      * @param input ABNF文法文字列。
      * @return コンパイル済みルールマップ。
      */
-    public static CompiledRules compile(String input) {
+    public static ABNFCompiledRules compile(String input) {
         return compile(new ByteAccesser(input));
     }
     

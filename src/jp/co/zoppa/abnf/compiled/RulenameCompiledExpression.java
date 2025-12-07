@@ -3,8 +3,8 @@ package jp.co.zoppa.abnf.compiled;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.co.zoppa.abnf.AnalyzeRange;
-import jp.co.zoppa.abnf.CompiledRules;
+import jp.co.zoppa.abnf.ABNFAnalyzeItem;
+import jp.co.zoppa.abnf.ABNFCompiledRules;
 import jp.co.zoppa.abnf.accesser.IByteAccesser;
 import jp.co.zoppa.abnf.expression.ExpressionEnum;
 import jp.co.zoppa.abnf.expression.ExpressionRange;
@@ -26,18 +26,25 @@ public final class RulenameCompiledExpression implements ICompiledExpression {
     }
 
     @Override
-    public boolean analyze(CompiledRules rules, IByteAccesser accesser, List<AnalyzeRange> answer) {
+    public boolean analyze(ABNFCompiledRules rules, IByteAccesser accesser, List<ABNFAnalyzeItem> answer) {
         IByteAccesser.IPosition mark = accesser.mark();
-        List<AnalyzeRange> tempAnswers = new ArrayList<>();
+        ArrayList<ABNFAnalyzeItem> tempAnswers = new ArrayList<ABNFAnalyzeItem>();
         int start = accesser.getPosition();
 
         // ルール名に対応するルールをマッチさせる
         if (rules.getRule(this.ruleName).getExpression().analyze(rules, accesser, tempAnswers)) {
-            AnalyzeRange range = new AnalyzeRange(ExpressionEnum.RULE, ruleName, accesser.span(start, accesser.getPosition()), tempAnswers);
+            ABNFAnalyzeItem range = new ABNFAnalyzeItem(
+                ExpressionEnum.RULE, 
+                ruleName, 
+                accesser.span(start, accesser.getPosition()), 
+                tempAnswers
+            );
             answer.add(range);
             return true;
         }
         else {
+            // マッチしなかった場合は元の位置に戻す
+            rules.setUnmatchedRule(this.ruleName, accesser.span(start));
             mark.restore();
             return false;
         }

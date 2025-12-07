@@ -3,8 +3,8 @@ package jp.co.zoppa.abnf.compiled;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.co.zoppa.abnf.AnalyzeRange;
-import jp.co.zoppa.abnf.CompiledRules;
+import jp.co.zoppa.abnf.ABNFAnalyzeItem;
+import jp.co.zoppa.abnf.ABNFCompiledRules;
 import jp.co.zoppa.abnf.accesser.IByteAccesser;
 import jp.co.zoppa.abnf.expression.ExpressionRange;
 
@@ -47,9 +47,9 @@ public final class RepetitionCompiledExpression implements ICompiledExpression {
     }
 
     @Override
-    public boolean analyze(CompiledRules rules, IByteAccesser accesser, List<AnalyzeRange> answer) {
+    public boolean analyze(ABNFCompiledRules rules, IByteAccesser accesser, List<ABNFAnalyzeItem> answer) {
         IByteAccesser.IPosition mark = accesser.mark();
-        List<AnalyzeRange> tempAnswers = new ArrayList<>();
+        List<ABNFAnalyzeItem> tempAnswers = new ArrayList<>();
         int matchCount = 0;
 
         // 繰り返しマッチ数をカウント
