@@ -44,7 +44,7 @@ public final class RulenameCompiledExpression implements ICompiledExpression {
         }
         else {
             // マッチしなかった場合は元の位置に戻す
-            rules.setUnmatchedRule(this.ruleName, accesser.span(start));
+            rules.setUnmatchedRule(this.ruleName);
             mark.restore();
             return false;
         }

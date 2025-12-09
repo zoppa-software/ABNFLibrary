@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import jp.co.zoppa.abnf.ABNFAnalyzeException;
 import jp.co.zoppa.abnf.accesser.IByteAccesser;
 
 /**
@@ -14,11 +15,12 @@ import jp.co.zoppa.abnf.accesser.IByteAccesser;
 public final class RuleListExpression implements IExpression {
 
     @Override
-    public ExpressionRange match(IByteAccesser accesser) {
+    public ExpressionRange match(IByteAccesser accesser) throws ABNFAnalyzeException {
         int start = accesser.getPosition();
         List<ExpressionRange> ranges = new ArrayList<>();
         Map<String, ExpressionRange> tree = new TreeMap<>();
         ExpressionRange range;
+        int prevPos = -1;
 
         while (accesser.peek() != -1) {
             // ルール式をマッチングする
@@ -48,6 +50,13 @@ public final class RuleListExpression implements IExpression {
 
             // 改行のみが続く場合はスキップする
             ExpressionDefines.getCrlfExpr().match(accesser);
+
+            // 進捗チェック
+            if (prevPos == accesser.getPosition()) {
+                throw new ABNFAnalyzeException(
+                    String.format("解析エラー：'%s'", accesser.span(accesser.getPosition()).toString(20))
+                );
+            }
         }
 
         // マッチ結果を返す

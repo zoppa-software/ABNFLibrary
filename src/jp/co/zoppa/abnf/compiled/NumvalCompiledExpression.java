@@ -14,6 +14,9 @@ import jp.co.zoppa.abnf.expression.ExpressionRange;
  */
 public final class NumvalCompiledExpression implements ICompiledExpression {
 
+    /** 比較文字。 */
+    private final String spanStr;
+
     /** 数値値の種類。 */
     private final int type;
 
@@ -28,6 +31,9 @@ public final class NumvalCompiledExpression implements ICompiledExpression {
      * @param expression 表現式。
      */
     public NumvalCompiledExpression(ExpressionRange expression) {
+        this.spanStr = expression.getSpan().toString();
+
+        // 数値種別を取得
         this.type = expression.getSpan().getByte(1);
 
         // 表現式の種類を取得
@@ -61,6 +67,7 @@ public final class NumvalCompiledExpression implements ICompiledExpression {
     @Override
     public boolean analyze(ABNFCompiledRules rules, IByteAccesser accesser, List<ABNFAnalyzeItem> answer) {
         IByteAccesser.IPosition mark = accesser.mark();
+        int start = accesser.getPosition();
 
         switch (this.exprem) {
             case ExpressionEnum.NUMVAL:
@@ -91,6 +98,7 @@ public final class NumvalCompiledExpression implements ICompiledExpression {
         }
 
         // マッチしなかった場合は元の位置に戻す
+        rules.setUnmatchedTerminal(this.spanStr, accesser.span(start));
         mark.restore();
         return false;
     }

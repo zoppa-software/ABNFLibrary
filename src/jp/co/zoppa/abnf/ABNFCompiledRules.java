@@ -518,6 +518,9 @@ public final class ABNFCompiledRules {
     /** 未マッチルール。 */
     private String unmatchedRuleName = "";
 
+    /** 未マッチ終端記号。 */
+    private String unmatchedTerminal = "";
+
     /** 未マッチ範囲。 */
     private Span unmatchedSpan = null;
 
@@ -550,14 +553,19 @@ public final class ABNFCompiledRules {
      * @param ruleName ルール名。
      * @param input 入力バイト情報。
      * @return 解析結果リスト。
+     * @throws ABNFAnalyzeException 解析例外。
      */
-    public ABNFAnalyzeItem analyze(String ruleName, IByteAccesser input) {
+    public ABNFAnalyzeItem analyze(String ruleName, IByteAccesser input) throws ABNFAnalyzeException {
         this.unmatchedRuleName = "";
         this.unmatchedSpan = null;
         if (compiledRules.containsKey(ruleName)) {
             ArrayList<ABNFAnalyzeItem> answer = new ArrayList<ABNFAnalyzeItem>();
-            compiledRules.get(ruleName).getExpression().analyze(this, input, answer);
-            return new ABNFAnalyzeItem(ExpressionEnum.RULE, ruleName, input.span(0), answer);
+            if (compiledRules.get(ruleName).getExpression().analyze(this, input, answer)) {
+                return new ABNFAnalyzeItem(ExpressionEnum.RULE, ruleName, input.span(0), answer);
+            }
+            else {
+                throw new ABNFAnalyzeException(getUnmatchedRuleMessage());
+            }
         } else {
             throw new IllegalArgumentException("対象のルールは存在しません: " + ruleName);
         }
@@ -580,10 +588,18 @@ public final class ABNFCompiledRules {
     /**
      * 未マッチルール情報を設定する。
      * @param ruleName ルール名。
+     */
+    public void setUnmatchedRule(String ruleName) {
+        this.unmatchedRuleName = ruleName;
+    }
+
+    /**
+     * 未マッチ終端記号を設定する。
+     * @param term 終端記号。
      * @param span 未マッチ範囲。
      */
-    public void setUnmatchedRule(String ruleName, Span span) {
-        this.unmatchedRuleName = ruleName;
+    public void setUnmatchedTerminal(String term, Span span) {
+        this.unmatchedTerminal = term;
         this.unmatchedSpan = span;
     }
 
@@ -592,8 +608,18 @@ public final class ABNFCompiledRules {
      * @return 未マッチルール情報メッセージ。
      */
     public String getUnmatchedRuleMessage() {
-        return String.format("ルール:%s が一致しませんでした。'%s'", 
-                this.unmatchedRuleName, this.unmatchedSpan.toString(30));
+        StringBuffer sb = new StringBuffer();
+        if (!this.unmatchedRuleName.isEmpty()) {
+            sb.append(String.format("ルール:%s ", this.unmatchedRuleName));
+        }
+        if (!this.unmatchedTerminal.isEmpty()) {
+            sb.append(String.format("終端記号:'%s' ", this.unmatchedTerminal));
+        }
+        sb.append("が一致しませんでした。");
+        if (this.unmatchedSpan != null) {
+            sb.append(String.format("'%s'", this.unmatchedSpan.toString(30)));
+        }
+        return sb.toString();
     }
 
 }

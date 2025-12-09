@@ -77,6 +77,7 @@ public final class RuleCompiledExpression {
             return (
                 expression.getSubRanges().size() > 1 ?
                 new RepetitionCompiledExpression(
+                    expression.getSpan().toString(),
                     expression.getSubRanges().get(0),
                     compile(expression.getSubRanges().get(1))
                 ) :

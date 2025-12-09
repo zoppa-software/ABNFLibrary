@@ -1,6 +1,7 @@
 package jp.co.zoppa.abnf;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import jp.co.zoppa.abnf.accesser.Span;
 import jp.co.zoppa.abnf.expression.ExpressionEnum;
@@ -19,7 +20,7 @@ public final class ABNFAnalyzeItem {
      * 空のマッチ結果リストを取得する。
      * @return 空のマッチ結果リスト。
      */
-    public static ArrayList<ABNFAnalyzeItem> getSpaceExpr() {
+    public static List<ABNFAnalyzeItem> getSpaceExpr() {
         if (emptyRanges == null) {
             synchronized (ABNFAnalyzeItem.class) {
                 if (emptyRanges == null) {
@@ -36,7 +37,7 @@ public final class ABNFAnalyzeItem {
 
     private final String ruleName;
 
-    private final ArrayList<ABNFAnalyzeItem> subRanges;
+    private final List<ABNFAnalyzeItem> subRanges;
 
     public ABNFAnalyzeItem(ExpressionEnum type, String name, Span span) {
         this.type = type;
@@ -45,7 +46,7 @@ public final class ABNFAnalyzeItem {
         this.subRanges = getSpaceExpr();
     }
 
-    public ABNFAnalyzeItem(ExpressionEnum type, String name, Span span, ArrayList<ABNFAnalyzeItem> subRanges) {
+    public ABNFAnalyzeItem(ExpressionEnum type, String name, Span span, List<ABNFAnalyzeItem> subRanges) {
         this.type = type;
         this.ruleName = name;
         this.span = span;
@@ -64,7 +65,7 @@ public final class ABNFAnalyzeItem {
         return ruleName;
     }
 
-    public ArrayList<ABNFAnalyzeItem> getSubRanges() {
+    public List<ABNFAnalyzeItem> getSubRanges() {
         return subRanges;
     }
     

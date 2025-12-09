@@ -16,7 +16,7 @@ public final class ABNFSyntaxAnalysis {
      * @param accesser ABNF文法のバイトアクセス。
      * @return コンパイル済みルール。
      */
-    public static ABNFCompiledRules compile(ByteAccesser accesser) {
+    public static ABNFCompiledRules compile(ByteAccesser accesser) throws ABNFAnalyzeException {
         ExpressionRange answer = ExpressionDefines.getRuleListExpr().match(accesser);
 
         Map<String, RuleCompiledExpression> compiled = new TreeMap<>();
@@ -37,7 +37,7 @@ public final class ABNFSyntaxAnalysis {
      * @param input ABNF文法文字列。
      * @return コンパイル済みルールマップ。
      */
-    public static ABNFCompiledRules compile(String input) {
+    public static ABNFCompiledRules compile(String input) throws ABNFAnalyzeException {
         return compile(new ByteAccesser(input));
     }
     

@@ -6,6 +6,7 @@ import java.util.List;
 import jp.co.zoppa.abnf.ABNFAnalyzeItem;
 import jp.co.zoppa.abnf.ABNFCompiledRules;
 import jp.co.zoppa.abnf.accesser.IByteAccesser;
+import jp.co.zoppa.abnf.expression.ExpressionEnum;
 import jp.co.zoppa.abnf.expression.ExpressionRange;
 
 /**
@@ -16,6 +17,9 @@ public final class RepetitionCompiledExpression implements ICompiledExpression {
     /** 繰り返し対象表現。 */
     private final ICompiledExpression expression;
 
+    /** 繰り返し式文字列。 */
+    private final String repetitionString;
+
     /** 繰り返しパターン。 */
     private final int repetitionPattern;
 
@@ -23,12 +27,15 @@ public final class RepetitionCompiledExpression implements ICompiledExpression {
     private final int lowCount, highCount;
 
     /**
-     * コンストラクタ
-     * @param repeatExpr 繰り返し回数表現式
-     * @param compile 繰り返し対象表現のコンパイル済み表現
+     * コンストラクタ。
+     * @param repetitionString 繰り返し式文字列。
+     * @param repeatExpr 繰り返し回数表現式。
+     * @param compile 繰り返し対象表現のコンパイル済み表現。
      */
-    public RepetitionCompiledExpression(ExpressionRange repeatExpr, ICompiledExpression expression) {
+    public RepetitionCompiledExpression(String repetitionString, ExpressionRange repeatExpr, ICompiledExpression expression) {
         this.expression = expression;
+
+        this.repetitionString = repetitionString;
         this.repetitionPattern = repeatExpr.getSubRanges().size();
         switch (this.repetitionPattern) {
             case 1:
@@ -50,11 +57,12 @@ public final class RepetitionCompiledExpression implements ICompiledExpression {
     public boolean analyze(ABNFCompiledRules rules, IByteAccesser accesser, List<ABNFAnalyzeItem> answer) {
         IByteAccesser.IPosition mark = accesser.mark();
         List<ABNFAnalyzeItem> tempAnswers = new ArrayList<>();
+        int start = accesser.getPosition();
         int matchCount = 0;
 
         // 繰り返しマッチ数をカウント
-        while (expression.analyze(rules, accesser, tempAnswers)) {
-            matchCount++;
+        for (; matchCount < this.highCount && 
+            expression.analyze(rules, accesser, tempAnswers); matchCount++) {
         }
 
         // 繰り返し回数の範囲チェック
@@ -63,7 +71,13 @@ public final class RepetitionCompiledExpression implements ICompiledExpression {
             return false;
         }
 
-        answer.addAll(tempAnswers);
+        ABNFAnalyzeItem range = new ABNFAnalyzeItem(
+            ExpressionEnum.RULE, 
+            this.repetitionString, 
+            accesser.span(start, accesser.getPosition()), 
+            tempAnswers
+        );
+        answer.add(range);
         return true;
     }
 
