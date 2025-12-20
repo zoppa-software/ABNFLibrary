@@ -73,7 +73,6 @@ public final class NumvalExpression implements IExpression {
      * @return マッチ結果
      */
     private ExpressionRange matchValue(IByteAccesser accesser, int numbers[]) {
-        IByteAccesser.IPosition mark = accesser.mark();
         int start = accesser.getPosition();
         List<ExpressionRange> ranges = new ArrayList<>();
 
@@ -165,7 +164,6 @@ public final class NumvalExpression implements IExpression {
         }
         else {
             // マッチング失敗
-            mark.restore();
             return ExpressionRange.getInvalid();
         }
     }

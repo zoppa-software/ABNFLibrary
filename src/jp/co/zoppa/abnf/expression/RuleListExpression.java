@@ -57,6 +57,7 @@ public final class RuleListExpression implements IExpression {
                     String.format("解析エラー：'%s'", accesser.span(accesser.getPosition()).toString(20))
                 );
             }
+            prevPos = accesser.getPosition();
         }
 
         // マッチ結果を返す

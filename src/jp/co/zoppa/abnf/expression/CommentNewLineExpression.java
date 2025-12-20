@@ -10,6 +10,8 @@ public final class CommentNewLineExpression implements IExpression {
 
     @Override
     public ExpressionRange match(IByteAccesser accesser) {
+        IByteAccesser.IPosition mark = accesser.mark();
+
         // コメントの開始文字でない場合は無効とする
         ExpressionRange comment = ExpressionDefines.getCommentExpr().match(accesser);
         if (comment.isEnable()) {
@@ -18,6 +20,8 @@ public final class CommentNewLineExpression implements IExpression {
                 return comment;
             }
         }
+
+        mark.restore();
         return ExpressionRange.getInvalid();
     }
 
