@@ -101,14 +101,44 @@ public final class NumvalExpression implements IExpression {
         }
         if (fena) {
             ranges.add(new ExpressionRange(this, accesser.span(fst, accesser.getPosition())));
-        }
 
-        if (accesser.peek() == '.') {
-            // 連結取得
-            accesser.read();
+            if (accesser.peek() == '.') {
+                // 連結取得
+                accesser.read();
 
-            // 続く数字を取得
-            while (true) {
+                // 続く数字を取得
+                while (true) {
+                    int nst = accesser.getPosition();
+                    boolean nena = false;
+                    while (true) {
+                        b = accesser.peek();
+                        if (b >= 0 && numSet[b]) {
+                            accesser.read();
+                            enable = true;
+                            nena = true;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    if (nena) {
+                        ranges.add(new ExpressionRange(ExpressionDefines.getNumvalConcatExpr(), accesser.span(nst, accesser.getPosition())));
+                    }
+
+                    // 次のピリオドを確認
+                    if (accesser.peek() == '.') {
+                        accesser.read();
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+            else if (accesser.peek() == '-') {
+                // 範囲取得
+                accesser.read();
+
+                // 続く数字を取得
                 int nst = accesser.getPosition();
                 boolean nena = false;
                 while (true) {
@@ -123,38 +153,8 @@ public final class NumvalExpression implements IExpression {
                     }
                 }
                 if (nena) {
-                    ranges.add(new ExpressionRange(ExpressionDefines.getNumvalConcatExpr(), accesser.span(nst, accesser.getPosition())));
+                    ranges.add(new ExpressionRange(ExpressionDefines.getNumvalRangeExpr(), accesser.span(nst, accesser.getPosition())));
                 }
-
-                // 次のピリオドを確認
-                if (accesser.peek() == '.') {
-                    accesser.read();
-                }
-                else {
-                    break;
-                }
-            }
-        }
-        else if (accesser.peek() == '-') {
-            // 範囲取得
-            accesser.read();
-
-            // 続く数字を取得
-            int nst = accesser.getPosition();
-            boolean nena = false;
-            while (true) {
-                b = accesser.peek();
-                if (b >= 0 && numSet[b]) {
-                    accesser.read();
-                    enable = true;
-                    nena = true;
-                }
-                else {
-                    break;
-                }
-            }
-            if (nena) {
-                ranges.add(new ExpressionRange(ExpressionDefines.getNumvalRangeExpr(), accesser.span(nst, accesser.getPosition())));
             }
         }
 
